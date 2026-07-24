@@ -174,11 +174,11 @@ async function callClaude(prompt){
 function ctx(c){return`Account: ${c.n}\nHealth: ${c.hs}/100 (prev ${c.prev})\nARR: ${fmt(c.arr)}\nTier: ${c.tier}\nPhase: ${c.ph}\nStatus: ${c.st}\nCSM: ${c.csm} (score ${c.cs}/5)\nRenewal: ${c.ren||"N/A"} (${c.rd?c.rd+" days":"—"})\nSignals: ${c.sig.length?c.sig.join(", "):"None"}\nHealth — Usage:${c.hb.U} Engagement:${c.hb.E} Support:${c.hb.Su} Sentiment:${c.hb.Se} Momentum:${c.hb.M}\nContacts: ${c.contacts.length?c.contacts.map(ct=>ct.n+" ("+ct.p+(ct.t?', '+ct.t:'')+")").join(", "):"None synced"}\nDeal: ${c.deal?'Stage: '+c.deal.stage+', ARR: '+fmt(c.deal.arr)+', TCV: '+fmt(c.deal.total):'No deal linked'}`;}
 
 // Nav
-const navItems=[{id:"dashboard",label:"Portfolio",icon:"📊"},{id:"model",label:"Health Model",icon:"💡"},{id:"agents",label:"Agents",icon:"⚡"}];
+const navItems=[{id:"dashboard",label:"Portfolio",icon:"📊"},{id:"contacts",label:"Contacts",icon:"👥"},{id:"model",label:"Health Model",icon:"💡"},{id:"agents",label:"Agents",icon:"⚡"}];
 function renderNav(){document.getElementById("nav").innerHTML=navItems.map(it=>`<button class="${state.view===it.id||(state.view==="detail"&&it.id==="dashboard")?"active":""}" onclick="nav('${it.id}')">${it.icon} <span>${it.label}</span></button>`).join("");}
 function nav(v){state.view=v;if(v!=="detail")state.selectedId=null;render();}
 function selectAcct(id){state.selectedId=id;state.view="detail";render();}
-function render(){renderNav();const a=document.getElementById("app");if(state.view==="dashboard")renderDash(a);else if(state.view==="detail")renderDetail(a);else if(state.view==="model")renderModel(a);else if(state.view==="agents")renderAgents(a);}
+function render(){renderNav();const a=document.getElementById("app");if(state.view==="dashboard")renderDash(a);else if(state.view==="detail")renderDetail(a);else if(state.view==="contacts")renderContacts(a);else if(state.view==="model")renderModel(a);else if(state.view==="agents")renderAgents(a);}
 
 function renderDash(el){
   const pool=state.owner==="all"?state.companies:state.companies.filter(c=>c.csmId===state.owner);
@@ -284,6 +284,47 @@ async function genSum(id){
   b.disabled=true;b.textContent="Generating…";o.innerHTML='<div style="margin-top:16px"><span class="spinner"></span> Analyzing…</div>';
   const t=await callClaude("You are a customer success strategist. Write a concise executive summary. Cover: situation, risks, opportunities, actions. 3-4 paragraphs, no headers, no bullets.\n\n"+ctx(c));
   o.innerHTML=`<div class="ai-output">${esc(t)}</div>`;b.textContent="Regenerate";b.disabled=false;
+}
+
+/* ═══ CONTACTS ═══ */
+function renderContacts(el){
+  // Collect all contacts across companies
+  const all=[];
+  state.companies.forEach(c=>{
+    c.contacts.forEach(ct=>{if(ct.n&&ct.n!=='—')all.push({...ct,company:c.n,companyId:c.id,hs:c.hs,col:c.col});});
+  });
+  const typeOrder={'Exec Sponsor':0,'Decision Maker':1,'Main User':2,'Tech/Ops':3,'End User':4};
+  const filtered=state._ctFilter?all.filter(ct=>ct.t===state._ctFilter):all;
+  const sorted=filtered.sort((a,b)=>(typeOrder[a.t]??5)-(typeOrder[b.t]??5));
+  const typeColors={'Exec Sponsor':'#7C3AED','Decision Maker':'#06B6D4','Main User':'#10B981','Tech/Ops':'#64748B','End User':'#94A3B8'};
+  const typeCounts={};all.forEach(ct=>{typeCounts[ct.t]=(typeCounts[ct.t]||0)+1;});
+
+  el.innerHTML=`
+    <div class="page-header">
+      <div><h1>Contacts</h1><p class="sub">${all.length} stakeholders across ${state.companies.filter(c=>c.contacts.some(ct=>ct.n&&ct.n!=='—')).length} accounts</p></div>
+      <input type="text" placeholder="Search contacts…" oninput="state._ctSearch=this.value;renderContacts(document.getElementById('app'))" style="width:200px">
+    </div>
+    <div class="kpi-row" style="grid-template-columns:repeat(5,1fr)">
+      ${Object.entries(typeColors).map(([type,color])=>{const cnt=typeCounts[type]||0;return`<div class="card kpi" style="cursor:pointer;border:2px solid ${state._ctFilter===type?color:'transparent'}" onclick="state._ctFilter=state._ctFilter==='${type}'?null:'${type}';renderContacts(document.getElementById('app'))"><div class="label" style="color:${color}">${type}</div><div class="value" style="font-size:24px;color:${color}">${cnt}</div></div>`;}).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--s400);margin-bottom:8px">Showing ${sorted.length} of ${all.length} contacts${state._ctFilter?' · Filtered by '+state._ctFilter:''}</div>
+    <div class="card" style="padding:0;overflow-x:auto">
+      <table class="acct-table">
+        <thead><tr><th>Contact</th><th>Role</th><th>User Type</th><th>Level</th><th>Account</th><th>Health</th><th>Email</th></tr></thead>
+        <tbody>${sorted.filter(ct=>{const q=(state._ctSearch||'').toLowerCase();return!q||ct.n.toLowerCase().includes(q)||ct.company.toLowerCase().includes(q)||(ct.p||'').toLowerCase().includes(q);}).map(ct=>{
+          const tc=typeColors[ct.t]||'#94A3B8';
+          const acctSt=st(ct.hs);
+          return`<tr onclick="selectAcct(${ct.companyId})" style="cursor:pointer">
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="contact-avatar" style="${ct.t==='Exec Sponsor'?'background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff;width:36px;height:36px':ct.t==='Decision Maker'?'background:#06B6D418;color:#06B6D4;width:36px;height:36px':'width:36px;height:36px'}">${ini(ct.n)}</div><div><div style="font-size:13px;font-weight:600">${esc(ct.n)}</div><div style="font-size:11px;color:var(--s500)">${esc(ct.p||'')}${ct.d?' · '+ct.d:''}</div></div></div></td>
+            <td style="font-size:12px;color:var(--s600)">${esc(ct.p||'—')}</td>
+            <td><span style="font-size:11px;font-weight:600;color:${tc};background:${tc}14;padding:2px 8px;border-radius:6px">${ct.t||'—'}</span></td>
+            <td>${ct.l?`<span style="font-size:11px;font-weight:700;color:var(--s500);background:var(--s100);padding:2px 6px;border-radius:4px">${ct.l}</span>`:'—'}</td>
+            <td><div style="display:flex;align-items:center;gap:6px"><div class="acct-ini" style="background:${ct.col};width:24px;height:24px;font-size:9px;border-radius:6px">${ini(ct.company)}</div><span style="font-size:12px;font-weight:500">${esc(ct.company)}</span></div></td>
+            <td><span class="hs-num" style="font-size:12px;color:${acctSt==="healthy"?"var(--emerald)":acctSt==="monitor"?"var(--amber)":"var(--rose)"}">${ct.hs}</span></td>
+            <td><a href="mailto:${esc(ct.e)}" style="font-size:11px;color:var(--v600);text-decoration:none" onclick="event.stopPropagation()">✉ ${esc(ct.e)}</a></td>
+          </tr>`;}).join('')}</tbody>
+      </table>
+    </div>`;
 }
 
 function renderModel(el){
