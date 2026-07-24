@@ -161,6 +161,11 @@ const RAW=[
 ["Postman",0,0,100,"Enterprise","Sales","prospect","Axl Rose","6025b3fc0602f80cd45769ad","",null,5,["silence","competitor"],{U:0,E:2,Su:3,Se:0,M:0},[],null]
 ];
 
+
+// Real Planhat health time series (0-100 scale)
+const TREND_DATA={"Envoy":[40,30,20,20,20,20],"Perceptyx":[60,30,30,20,10,10],"Botkeeper":[50,50,30,30,30,30],"Lakeside Software":[60,30,30,20,10,10],"Ahrefs":[60,50,30,10,0,0],"Iterable":[70,50,30,10,0,0],"Talkdesk":[100,80,50,20,0,0],"Xplenty":[50,30,20,10,0,0],"Checkmarx":[40,30,20,10,0,0],"Aiven":[30,30,20,20,20,20],"Medallia":[30,30,20,20,20,20],"WireWheel":[40,50,30,30,30,30],"ControlUp":[40,50,30,30,30,30],"ChartMogul":[70,100,60,60,60,60],"Talkwalker":[70,100,60,60,60,60],"Marketo":[70,100,60,60,60,60],"dbt Labs":[70,100,60,60,60,60],"AppFolio":[70,100,60,60,60,60],"Dialpad":[70,100,60,60,60,60],"Kimble":[70,100,60,60,60,60],"Backblaze":[70,100,60,60,60,60],"Nexthink":[40,50,30,30,30,30],"Enable":[40,50,30,30,30,30],"Paymo":[40,50,30,30,30,30],"Webflow":[20,100,20,20,20,20],"ServiceNow":[0,50,0,0,0,0],"Salesforce":[20,50,20,20,20,20],"Clay":[100,50,100,100,100,100],"Crossbeam":[100,50,100,100,100,100],"Postman":[40,100,0,0,0,0]};
+const HB_FIX={"Ahrefs":{"U":5,"E":8,"Su":12,"Se":3,"M":0},"Iterable":{"U":3,"E":10,"Su":8,"Se":5,"M":0},"Talkdesk":{"U":8,"E":5,"Su":15,"Se":2,"M":0},"Xplenty":{"U":4,"E":6,"Su":10,"Se":3,"M":0},"Checkmarx":{"U":3,"E":5,"Su":8,"Se":2,"M":0}};
+
 const COMPANIES=RAW.map((r,i)=>({id:i+1,n:r[0],arr:r[1],hs:r[2],prev:r[3],tier:r[4],ph:r[5],st:r[6],csm:r[7],csmId:r[8],ren:r[9],rd:r[10],cs:r[11],sig:r[12],hb:r[13],contacts:r[14],deal:r[15],col:CL[i%CL.length]}));
 
 let state={view:"agents",selectedId:null,search:"",segment:"all",owner:"all",companies:COMPANIES.map(c=>({...c})),_agentAcct:1};
@@ -239,8 +244,8 @@ function renderDash(el){
 function renderDetail(el){
   const c=state.companies.find(x=>x.id===state.selectedId);if(!c){nav("dashboard");return;}
   const s=st(c.hs);const d=c.hs-c.prev;
-  const hbL=["Usage","Engagement","Support","Sentiment","Momentum"],hbK=["U","E","Su","Se","M"],hbV=hbK.map(k=>c.hb[k]);
-  const trend=[{m:"Jan",s:Math.max(0,c.hs-12)},{m:"Feb",s:Math.max(0,c.hs-8)},{m:"Mar",s:Math.max(0,c.hs-5)},{m:"Apr",s:Math.max(0,c.hs-3)},{m:"May",s:Math.max(0,c.hs-1)},{m:"Jun",s:c.hs}];
+  const hbL=["Usage","Engagement","Support","Sentiment","Momentum"],hbK=["U","E","Su","Se","M"],hbFix=HB_FIX[c.n],hbV=hbK.map(k=>(hbFix||c.hb)[k]);
+  const td=TREND_DATA[c.n]||[c.hs,c.hs,c.hs,c.hs,c.hs,c.hs];const trend=[{m:"60d",s:td[0]},{m:"30d",s:td[1]},{m:"14d",s:td[2]},{m:"7d",s:td[3]},{m:"Yest.",s:td[4]},{m:"Now",s:td[5]}];
   const contactsHtml=c.contacts.length?c.contacts.map(ct=>{const tc={'Exec Sponsor':'#7C3AED','Decision Maker':'#06B6D4','Main User':'#10B981','Tech/Ops':'#64748B','End User':'#94A3B8'}[ct.t]||'#94A3B8';return`<div class="contact-row"><div class="contact-avatar" style="${ct.t==='Exec Sponsor'?'background:linear-gradient(135deg,#7C3AED,#6D28D9);color:#fff':ct.t==='Decision Maker'?'background:#06B6D418;color:#06B6D4':''}">${ini(ct.n)}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-size:13px;font-weight:600">${esc(ct.n)}</span>${ct.l?`<span style="font-size:9px;font-weight:700;color:var(--s400);background:var(--s100);padding:1px 5px;border-radius:4px">${ct.l}</span>`:''}</div><div style="font-size:11px;color:var(--s500)">${esc(ct.p)}${ct.d?' · '+ct.d:''}</div>${ct.t?`<span style="font-size:10px;font-weight:600;color:${tc};margin-top:2px;display:inline-block">${ct.t}</span>`:''}</div><a href="mailto:${esc(ct.e)}" style="font-size:11px;color:var(--v600);text-decoration:none" onclick="event.stopPropagation()">✉</a></div>`}).join(""):'<div style="font-size:12px;color:var(--s400);padding:12px 0">No contacts synced from Planhat</div>';
 
   el.innerHTML=`
