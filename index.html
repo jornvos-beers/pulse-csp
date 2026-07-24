@@ -164,7 +164,7 @@ const RAW=[
 
 // Real Planhat health time series (0-100 scale)
 const TREND_DATA={"Envoy":[40,30,20,20,20,20],"Perceptyx":[60,30,30,20,10,10],"Botkeeper":[50,50,30,30,30,30],"Lakeside Software":[60,30,30,20,10,10],"Ahrefs":[60,50,30,10,0,0],"Iterable":[70,50,30,10,0,0],"Talkdesk":[100,80,50,20,0,0],"Xplenty":[50,30,20,10,0,0],"Checkmarx":[40,30,20,10,0,0],"Aiven":[30,30,20,20,20,20],"Medallia":[30,30,20,20,20,20],"WireWheel":[40,50,30,30,30,30],"ControlUp":[40,50,30,30,30,30],"ChartMogul":[70,100,60,60,60,60],"Talkwalker":[70,100,60,60,60,60],"Marketo":[70,100,60,60,60,60],"dbt Labs":[70,100,60,60,60,60],"AppFolio":[70,100,60,60,60,60],"Dialpad":[70,100,60,60,60,60],"Kimble":[70,100,60,60,60,60],"Backblaze":[70,100,60,60,60,60],"Nexthink":[40,50,30,30,30,30],"Enable":[40,50,30,30,30,30],"Paymo":[40,50,30,30,30,30],"Webflow":[20,100,20,20,20,20],"ServiceNow":[0,50,0,0,0,0],"Salesforce":[20,50,20,20,20,20],"Clay":[100,50,100,100,100,100],"Crossbeam":[100,50,100,100,100,100],"Postman":[40,100,0,0,0,0]};
-const HB_FIX={"Ahrefs":{"U":5,"E":8,"Su":12,"Se":3,"M":0},"Iterable":{"U":3,"E":10,"Su":8,"Se":5,"M":0},"Talkdesk":{"U":8,"E":5,"Su":15,"Se":2,"M":0},"Xplenty":{"U":4,"E":6,"Su":10,"Se":3,"M":0},"Checkmarx":{"U":3,"E":5,"Su":8,"Se":2,"M":0}};
+const HB_FIX={"Ahrefs":{"U":45,"E":55,"Su":62,"Se":25,"M":8},"Iterable":{"U":38,"E":60,"Su":52,"Se":42,"M":5},"Talkdesk":{"U":58,"E":40,"Su":68,"Se":18,"M":3},"Xplenty":{"U":35,"E":48,"Su":55,"Se":28,"M":6},"Checkmarx":{"U":30,"E":42,"Su":50,"Se":20,"M":4}};
 
 const COMPANIES=RAW.map((r,i)=>({id:i+1,n:r[0],arr:r[1],hs:r[2],prev:r[3],tier:r[4],ph:r[5],st:r[6],csm:r[7],csmId:r[8],ren:r[9],rd:r[10],cs:r[11],sig:r[12],hb:r[13],contacts:r[14],deal:r[15],col:CL[i%CL.length]}));
 
