@@ -179,11 +179,11 @@ async function callClaude(prompt){
 function ctx(c){return`Account: ${c.n}\nHealth: ${c.hs}/100 (prev ${c.prev})\nARR: ${fmt(c.arr)}\nTier: ${c.tier}\nPhase: ${c.ph}\nStatus: ${c.st}\nCSM: ${c.csm} (score ${c.cs}/5)\nRenewal: ${c.ren||"N/A"} (${c.rd?c.rd+" days":"—"})\nSignals: ${c.sig.length?c.sig.join(", "):"None"}\nHealth — Usage:${c.hb.U} Engagement:${c.hb.E} Support:${c.hb.Su} Sentiment:${c.hb.Se} Momentum:${c.hb.M}\nContacts: ${c.contacts.length?c.contacts.map(ct=>ct.n+" ("+ct.p+(ct.t?', '+ct.t:'')+")").join(", "):"None synced"}\nDeal: ${c.deal?'Stage: '+c.deal.stage+', ARR: '+fmt(c.deal.arr)+', TCV: '+fmt(c.deal.total):'No deal linked'}`;}
 
 // Nav
-const navItems=[{id:"agents",label:"Today",icon:"⚡"},{id:"dashboard",label:"Portfolio",icon:"📊"},{id:"contacts",label:"Contacts",icon:"👥"},{id:"model",label:"Health Model",icon:"💡"}];
+const navItems=[{id:"agents",label:"Today",icon:"⚡"},{id:"dashboard",label:"Portfolio",icon:"📊"},{id:"contacts",label:"Contacts",icon:"👥"},{id:"model",label:"Health Model",icon:"💡"},{id:"actions",label:"Actions",icon:"🚀"}];
 function renderNav(){document.getElementById("nav").innerHTML=navItems.map(it=>`<button class="${state.view===it.id||(state.view==="detail"&&it.id==="dashboard")?"active":""}" onclick="nav('${it.id}')">${it.icon} <span>${it.label}</span></button>`).join("");}
 function nav(v){state.view=v;if(v!=="detail")state.selectedId=null;render();}
 function selectAcct(id){state.selectedId=id;state.view="detail";render();}
-function render(){renderNav();const a=document.getElementById("app");if(state.view==="dashboard")renderDash(a);else if(state.view==="detail")renderDetail(a);else if(state.view==="contacts")renderContacts(a);else if(state.view==="model")renderModel(a);else if(state.view==="agents")renderAgents(a);}
+function render(){renderNav();const a=document.getElementById("app");if(state.view==="agents")renderAgents(a);else if(state.view==="dashboard")renderDash(a);else if(state.view==="detail")renderDetail(a);else if(state.view==="contacts")renderContacts(a);else if(state.view==="model")renderModel(a);else if(state.view==="actions")renderActions(a);}
 
 function renderDash(el){
   const pool=state.owner==="all"?state.companies:state.companies.filter(c=>c.csmId===state.owner);
@@ -422,6 +422,76 @@ function renderAgents(el){
       <div class="card"><h3 style="font-size:14px;font-weight:700;margin-bottom:12px">CS Actions</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">${actions.map(a=>`<button class="seg" style="text-align:left;padding:10px 12px" onclick="runAgent('${a.id}','${esc(a.l)}','${esc(a.d)}')"><strong style="font-size:12px">${a.l}</strong><div style="font-size:10px;color:var(--s400);margin-top:2px">${a.d}</div></button>`).join("")}</div>
         <div id="agentOut"></div></div>
+    </div>
+
+    <div style="margin-top:32px;position:relative">
+      <div style="font-size:13px;font-weight:600;color:var(--s500);margin-bottom:10px">💬 Ask Pulse anything about your portfolio</div>
+      <div style="display:flex;gap:10px">
+        <input type="text" id="chatInput" placeholder="e.g. Which accounts need attention this week? What's my biggest churn risk?" style="flex:1;padding:14px 18px;border-radius:14px;border:2px solid var(--s200);font-size:14px;transition:all .2s;background:#fff" onfocus="this.style.borderColor='#7C3AED';this.style.boxShadow='0 0 0 4px #ede9fe'" onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'" onkeydown="if(event.key==='Enter')askPulse()">
+        <button onclick="askPulse()" style="padding:14px 24px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--v600),var(--v700));color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s" onmouseenter="this.style.opacity='0.9'" onmouseleave="this.style.opacity='1'">Ask ⚡</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        ${["Which accounts are at risk?","Summarize my renewal pipeline","Who should I contact first?","Draft a save plan for Talkdesk"].map(q=>`<button style="padding:6px 12px;border-radius:8px;border:1px solid var(--s200);background:#fff;font-size:11px;color:var(--s600);cursor:pointer;transition:all .15s" onmouseenter="this.style.borderColor='#a78bfa';this.style.color='#7C3AED'" onmouseleave="this.style.borderColor='#e2e8f0';this.style.color='#475569'" onclick="document.getElementById('chatInput').value='${q}';askPulse()">${q}</button>`).join("")}
+      </div>
+      <div id="chatOut" style="margin-top:16px"></div>
+    </div>`;
+}
+async function askPulse(){
+  const input=document.getElementById("chatInput");const q=input.value.trim();if(!q)return;
+  const out=document.getElementById("chatOut");
+  out.innerHTML='<div class="card" style="margin-top:8px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--v500),var(--v700));display:flex;align-items:center;justify-content:center;font-size:12px">⚡</div><span style="font-size:13px;font-weight:600;color:var(--v700)">Pulse AI</span><span class="spinner" style="margin-left:auto"></span></div><div style="font-size:13px;color:var(--s400)">Analyzing your portfolio...</div></div>';
+  const portfolio=state.companies.map(c=>`${c.n}: health ${c.hs}/100, ARR ${fmt(c.arr)}, ${c.st}, phase ${c.ph}, CSM ${c.csm}, signals: ${c.sig.join(",")||"none"}, renewal: ${c.ren||"N/A"}`).join("\n");
+  const t=await callClaude(`You are Pulse AI, a customer success copilot. The CSM asks: "${q}"\n\nHere is their full portfolio:\n${portfolio}\n\nGive a specific, actionable answer based on the data. Reference account names, ARR figures, and health scores. Be concise — 3-5 paragraphs, no headers, no bullets.`);
+  out.innerHTML=`<div class="card" style="margin-top:8px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--v500),var(--v700));display:flex;align-items:center;justify-content:center;font-size:12px">⚡</div><span style="font-size:13px;font-weight:600;color:var(--v700)">Pulse AI</span></div><div class="ai-output" style="border-top:none;padding-top:0;margin-top:0">${esc(t)}</div></div>`;
+  input.value="";
+}
+
+/* ═══ ACTIONS ═══ */
+function renderActions(el){
+  el.innerHTML=`
+    <div style="max-width:640px;margin:0 auto;padding-top:40px;text-align:center">
+      <div style="font-size:48px;margin-bottom:16px">🚀</div>
+      <h1 style="font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px">Unlock the Full Power of Pulse</h1>
+      <p style="font-size:15px;color:var(--s500);line-height:1.7;margin-bottom:32px">You're currently on the <strong style="color:var(--s700)">Freemium</strong> plan. Upgrade to Enterprise to unlock automated workflows, real-time Planhat sync, unlimited AI agents, custom health models, and multi-team support.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;margin-bottom:32px">
+        <div class="card" style="border:2px solid var(--s200)">
+          <div style="font-size:12px;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Current Plan</div>
+          <div style="font-size:20px;font-weight:800;margin-bottom:12px">Freemium</div>
+          <div style="font-size:13px;color:var(--s500);line-height:1.8">
+            ✓ Portfolio dashboard<br>
+            ✓ Health score model<br>
+            ✓ Contact overview<br>
+            ✓ Manual data refresh<br>
+            <span style="color:var(--s300)">✗ Automated AI briefings</span><br>
+            <span style="color:var(--s300)">✗ Real-time data sync</span><br>
+            <span style="color:var(--s300)">✗ Custom integrations</span><br>
+            <span style="color:var(--s300)">✗ Team collaboration</span>
+          </div>
+        </div>
+        <div class="card" style="border:2px solid var(--v500);background:linear-gradient(135deg,rgba(124,58,237,.03),rgba(124,58,237,.06))">
+          <div style="font-size:12px;font-weight:700;color:var(--v600);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Recommended</div>
+          <div style="font-size:20px;font-weight:800;color:var(--v700);margin-bottom:12px">Enterprise</div>
+          <div style="font-size:13px;color:var(--s600);line-height:1.8">
+            ✓ Everything in Freemium<br>
+            ✓ <strong>Automated daily AI briefings</strong><br>
+            ✓ <strong>Real-time Planhat sync</strong><br>
+            ✓ <strong>Unlimited AI agents & actions</strong><br>
+            ✓ <strong>Custom health score models</strong><br>
+            ✓ <strong>Multi-team & role-based access</strong><br>
+            ✓ <strong>Workflow automations</strong><br>
+            ✓ <strong>Priority support & onboarding</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="background:linear-gradient(135deg,#4c1d95,#6d28d9);color:#fff;padding:32px;border:none">
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">Ready to upgrade?</div>
+        <p style="font-size:14px;opacity:.85;margin-bottom:20px;line-height:1.6">Get in touch with our team to discuss Enterprise pricing and get started with a personalized onboarding.</p>
+        <a href="mailto:maxime.ruggeri@pulse.com?subject=Pulse Enterprise License Inquiry&body=Hi Maxime,%0A%0AI'm interested in upgrading to Pulse Enterprise. Could we schedule a call to discuss pricing and onboarding?%0A%0AThanks!" style="display:inline-block;padding:14px 32px;border-radius:12px;background:#fff;color:var(--v700);font-size:14px;font-weight:700;text-decoration:none;transition:opacity .15s" onmouseenter="this.style.opacity='0.9'" onmouseleave="this.style.opacity='1'">Contact maxime.ruggeri@pulse.com →</a>
+      </div>
+
+      <p style="font-size:12px;color:var(--s400);margin-top:24px">Questions? Reach out at <a href="mailto:maxime.ruggeri@pulse.com" style="color:var(--v600)">maxime.ruggeri@pulse.com</a></p>
     </div>`;
 }
 async function runExec(){const c=state.companies.find(x=>x.id===state._agentAcct);if(!c)return;const b=document.getElementById("execBtn"),o=document.getElementById("execOut");b.disabled=true;b.textContent="Generating…";o.innerHTML='<div style="margin-top:16px"><span class="spinner"></span></div>';const t=await callClaude("You are a customer success executive advisor. Generate a strategic executive briefing. Cover: situation, risks, opportunities, recommended actions. 4-5 paragraphs, no headers, no bullets.\n\n"+ctx(c));o.innerHTML=`<div class="ai-output">${esc(t)}</div>`;b.textContent="Regenerate";b.disabled=false;}
