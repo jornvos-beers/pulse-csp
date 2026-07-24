@@ -169,8 +169,8 @@ const esc=s=>{const d=document.createElement("div");d.textContent=s;return d.inn
 const st=hs=>hs>=70?"healthy":hs>=40?"monitor":"at-risk";
 const ini=n=>n.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
 async function callClaude(prompt){
-  try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
-  const d=await r.json();return(d.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n")||"No response.";}catch(e){return"Error: "+e.message;}}
+  try{const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
+  const d=await r.json();if(d.error)return"Error: "+d.error;return d.text||"No response.";}catch(e){return"Error: "+e.message;}}
 function ctx(c){return`Account: ${c.n}\nHealth: ${c.hs}/100 (prev ${c.prev})\nARR: ${fmt(c.arr)}\nTier: ${c.tier}\nPhase: ${c.ph}\nStatus: ${c.st}\nCSM: ${c.csm} (score ${c.cs}/5)\nRenewal: ${c.ren||"N/A"} (${c.rd?c.rd+" days":"—"})\nSignals: ${c.sig.length?c.sig.join(", "):"None"}\nHealth — Usage:${c.hb.U} Engagement:${c.hb.E} Support:${c.hb.Su} Sentiment:${c.hb.Se} Momentum:${c.hb.M}\nContacts: ${c.contacts.length?c.contacts.map(ct=>ct.n+" ("+ct.p+")").join(", "):"None synced"}`;}
 
 // Nav
