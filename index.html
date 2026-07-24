@@ -105,7 +105,7 @@ select:focus,input[type=text]:focus{border-color:var(--v500);box-shadow:0 0 0 3p
   <nav id="nav"></nav>
   <div class="sidebar-source">
     <div class="label">🟢 <span>Planhat Live</span></div>
-    <div class="sub">30 accounts synced</div>
+    <div class="sub">30 accounts · contacts · deals</div>
   </div>
   <div class="sidebar-user"><div class="avatar">JV</div><div><div class="name">Jorn Vos</div><div class="role">CREW-04</div></div></div>
 </div>
@@ -129,39 +129,39 @@ const WEIGHTS=[{c:"Usage",w:30,d:"DAU/MAU, feature adoption, session depth",colo
 
 // Planhat data (2026-07-24) — [name,arr,hs,prev,tier,phase,status,csm,csmId,renewal,renewDays,csmScore,signals,hb,contacts]
 const RAW=[
-["Envoy",100000,20,30,"SMB","Risk","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-11-10",476,2,["overdue_touch","competitor"],{U:17,E:22,Su:23,Se:0,M:15},[]],
-["Perceptyx",100000,10,20,"Mid-Market","Risk","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-10-06",441,2,["overdue_touch","competitor"],{U:7,E:12,Su:13,Se:0,M:5},[]],
-["Botkeeper",100000,30,50,"SMB","Risk","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-11-10",476,3,["overdue_touch","competitor"],{U:24,E:32,Su:33,Se:0,M:20},[]],
-["Lakeside Software",100000,10,20,"Mid-Market","Risk","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-08-18",392,2,["overdue_touch","competitor"],{U:7,E:12,Su:13,Se:0,M:5},[]],
-["Ahrefs",120000,0,60,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-08-10",750,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[{n:"Oliver Kumar",p:"Engineering Manager",e:"oliver.kumar@ahrefs.com"}]],
-["Iterable",100000,0,60,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-01-15",177,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[{n:"Tomás Adams",p:"Contact",e:"t.adams@iterable.com"}]],
-["Talkdesk",120000,0,100,"SMB","Adoption","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-01-15",177,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[]],
-["Xplenty",120000,0,60,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-10-11",812,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[{n:"Elena Johnson",p:"Operations Analyst",e:"elena.johnson@xplenty.com"}]],
-["Checkmarx",2400,0,60,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-12-28",890,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[]],
-["Aiven",100000,20,30,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-09-02",407,2,["overdue_touch"],{U:17,E:22,Su:23,Se:20,M:15},[{n:"Tariq Singh",p:"Senior Data Analyst",e:"tariq.singh@aiven.com"}]],
-["Medallia",50000,20,30,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-01-15",177,2,["overdue_touch"],{U:17,E:22,Su:23,Se:20,M:15},[]],
-["WireWheel",100000,30,50,"SMB","Success","customer","Taylor Swift","6170e0db2880c167e44f7783","2028-03-08",595,3,[],{U:24,E:32,Su:33,Se:30,M:20},[]],
-["ControlUp",100000,30,50,"SMB","Success","customer","Taylor Swift","6170e0db2880c167e44f7783","2027-12-01",497,3,[],{U:24,E:32,Su:33,Se:30,M:20},[]],
-["ChartMogul",195000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2029-04-12",995,5,[],{U:48,E:62,Su:63,Se:60,M:40},[]],
-["Talkwalker",195000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-04-06",624,5,[],{U:48,E:62,Su:63,Se:60,M:40},[]],
-["Marketo",100000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-03-30",251,5,[],{U:48,E:62,Su:63,Se:60,M:40},[{n:"Matthew Brown",p:"Account Executive",e:"matthew.brown@marketo.com"}]],
-["dbt Labs",100000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-01-15",177,5,[],{U:48,E:62,Su:63,Se:60,M:40},[]],
-["AppFolio",100000,60,100,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-08-18",392,5,[],{U:48,E:62,Su:63,Se:60,M:40},[]],
-["Dialpad",75000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-11-08",840,5,[],{U:48,E:62,Su:63,Se:60,M:40},[]],
-["Kimble",100000,60,100,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2028-03-08",595,5,[],{U:48,E:62,Su:63,Se:60,M:40},[]],
-["Backblaze",120000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-06-08",687,5,[],{U:48,E:62,Su:63,Se:60,M:40},[{n:"Mia Patel",p:"Senior Account Executive",e:"mia.patel@backblaze.com"}]],
-["Nexthink",100000,30,50,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-07-07",350,3,[],{U:24,E:32,Su:33,Se:30,M:20},[]],
-["Enable",100000,30,50,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-12-29",525,3,[],{U:24,E:32,Su:33,Se:30,M:20},[]],
-["Paymo",75000,30,50,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-06-01",314,3,[],{U:24,E:32,Su:33,Se:30,M:20},[{n:"Hana King",p:"CEO",e:"hana.king@paymo.com"},{n:"Amir Baker",p:"IT Specialist",e:"amir.baker@paymo.com"}]],
-["Webflow",0,20,100,"Enterprise","Sales","prospect","Beyonce Knowles","6025b5380602f80cd4576a1e","",null,5,["silence"],{U:0,E:22,Su:23,Se:20,M:0},[]],
-["ServiceNow",0,0,50,"Enterprise","Sales","prospect","Axl Rose","6025b3fc0602f80cd45769ad","",null,3,["silence"],{U:0,E:2,Su:3,Se:0,M:0},[]],
-["Salesforce",0,20,50,"Enterprise","Sales","prospect","Axl Rose","6025b3fc0602f80cd45769ad","",null,3,[],{U:0,E:22,Su:23,Se:20,M:0},[]],
-["Clay",0,100,50,"Mid-Market","Sales","prospect","Aretha Franklin","5bca458722a689778607f256","",null,3,[],{U:100,E:100,Su:100,Se:100,M:100},[]],
-["Crossbeam",0,100,50,"Mid-Market","Sales","prospect","Ella Fitzgerald","6025b877fcae5a0c983823c1","",null,3,[],{U:100,E:100,Su:100,Se:100,M:100},[]],
-["Postman",0,0,100,"Enterprise","Sales","prospect","Axl Rose","6025b3fc0602f80cd45769ad","",null,5,["silence","competitor"],{U:0,E:2,Su:3,Se:0,M:0},[]],
+["Envoy",100000,20,30,"SMB","Risk","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-11-10",476,2,["overdue_touch","competitor"],{U:17,E:22,Su:23,Se:0,M:15},[],null],
+["Perceptyx",100000,10,20,"Mid-Market","Risk","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-10-06",441,2,["overdue_touch","competitor"],{U:7,E:12,Su:13,Se:0,M:5},[],null],
+["Botkeeper",100000,30,50,"SMB","Risk","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-11-10",476,3,["overdue_touch","competitor"],{U:24,E:32,Su:33,Se:0,M:20},[],null],
+["Lakeside Software",100000,10,20,"Mid-Market","Risk","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-08-18",392,2,["overdue_touch","competitor"],{U:7,E:12,Su:13,Se:0,M:5},[],null],
+["Ahrefs",120000,0,60,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-08-10",750,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[{n:"Oliver Kumar",p:"Engineering Manager",e:"o.kumar@ahrefs.com",t:"Main User",l:"L3",d:"Eng"},{n:"Mohammed Martin",p:"Director of Product",e:"m.martin@ahrefs.com",t:"Main User",l:"L2"}],null],
+["Iterable",100000,0,60,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-01-15",177,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[{n:"Emily Parker",p:"Head of Product",e:"e.parker@iterable.com",t:"Decision Maker",l:"L2"},{n:"Mia Li",p:"IT Specialist",e:"m.li@iterable.com",t:"Tech/Ops",l:"L4"}],null],
+["Talkdesk",120000,0,100,"SMB","Adoption","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-01-15",177,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[],null],
+["Xplenty",120000,0,60,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-10-11",812,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[{n:"Layla Garcia",p:"Head of Engineering",e:"l.garcia@xplenty.com",t:"Decision Maker",l:"L2",d:"Eng"},{n:"Elena Johnson",p:"Ops Analyst",e:"e.johnson@xplenty.com",t:"End User",l:"L4",d:"Ops"}],null],
+["Checkmarx",2400,0,60,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-12-28",890,1,["overdue_touch","silence"],{U:0,E:2,Su:3,Se:0,M:0},[],null],
+["Aiven",100000,20,30,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-09-02",407,2,["overdue_touch"],{U:17,E:22,Su:23,Se:20,M:15},[{n:"Tariq Singh",p:"Sr. Data Analyst",e:"t.singh@aiven.com",t:"Main User",l:"L3",d:"Ops"},{n:"Elena Thomas",p:"Business Analyst",e:"e.thomas@aiven.com",t:"End User",l:"L4",d:"Ops"}],null],
+["Medallia",50000,20,30,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-01-15",177,2,["overdue_touch"],{U:17,E:22,Su:23,Se:20,M:15},[{n:"Fatima Wilson",p:"CMO",e:"f.wilson@medallia.com",t:"Exec Sponsor",l:"L1",d:"Mktg"},{n:"Liam Evans",p:"Head of Data",e:"l.evans@medallia.com",t:"Decision Maker",l:"L2"}],null],
+["WireWheel",100000,30,50,"SMB","Success","customer","Taylor Swift","6170e0db2880c167e44f7783","2028-03-08",595,3,[],{U:24,E:32,Su:33,Se:30,M:20},[{n:"Zara Morris",p:"CPO",e:"z.morris@wirewheel.com",t:"Decision Maker",l:"L1"},{n:"Penelope Phillips",p:"VP of Product",e:"p.phillips@wirewheel.com",t:"Decision Maker",l:"L2"}],null],
+["ControlUp",100000,30,50,"SMB","Success","customer","Taylor Swift","6170e0db2880c167e44f7783","2027-12-01",497,3,[],{U:24,E:32,Su:33,Se:30,M:20},[{n:"Mason Cooper",p:"VP of Product",e:"m.cooper@controlup.com",t:"Decision Maker",l:"L2"},{n:"Logan Morgan",p:"VP of Product",e:"l.morgan@controlup.com",t:"Decision Maker",l:"L2"}],null],
+["ChartMogul",195000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2029-04-12",995,5,[],{U:48,E:62,Su:63,Se:60,M:40},[],{stage:"Closed Won",arr:194413,total:593500,start:"2026-03-31",end:"2029-04-19"}],
+["Talkwalker",195000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-04-06",624,5,[],{U:48,E:62,Su:63,Se:60,M:40},[],{stage:"Closed Won",arr:194120,total:395250,start:"2026-03-31",end:"2028-04-13"}],
+["Marketo",100000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-03-30",251,5,[],{U:48,E:62,Su:63,Se:60,M:40},[{n:"Matthew Brown",p:"Account Executive",e:"m.brown@marketo.com",t:"End User",l:"L4",d:"Sales"},{n:"Jacob Allen",p:"Ops Analyst",e:"j.allen@marketo.com",t:"End User",l:"L4",d:"Ops"}],null],
+["dbt Labs",100000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-01-15",177,5,[],{U:48,E:62,Su:63,Se:60,M:40},[],null],
+["AppFolio",100000,60,100,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-08-18",392,5,[],{U:48,E:62,Su:63,Se:60,M:40},[],null],
+["Dialpad",75000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-11-08",840,5,[],{U:48,E:62,Su:63,Se:60,M:40},[],null],
+["Kimble",100000,60,100,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2028-03-08",595,5,[],{U:48,E:62,Su:63,Se:60,M:40},[],null],
+["Backblaze",120000,60,100,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2028-06-08",687,5,[],{U:48,E:62,Su:63,Se:60,M:40},[{n:"Mia Patel",p:"Sr. Account Exec",e:"m.patel@backblaze.com",t:"Main User",l:"L3",d:"Sales"},{n:"Sebastian Baker",p:"Business Analyst",e:"s.baker@backblaze.com",t:"End User",l:"L4",d:"Ops"}],null],
+["Nexthink",100000,30,50,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-07-07",350,3,[],{U:24,E:32,Su:33,Se:30,M:20},[],null],
+["Enable",100000,30,50,"SMB","Success","customer","Mick Jagger","6025b65efcae5a0c98382388","2027-12-29",525,3,[],{U:24,E:32,Su:33,Se:30,M:20},[],null],
+["Paymo",75000,30,50,"SMB","Success","customer","CSM Team","69934cf2c44a097201c5f6e5","2027-06-01",314,3,[],{U:24,E:32,Su:33,Se:30,M:20},[{n:"Hana King",p:"CEO",e:"h.king@paymo.com",t:"Exec Sponsor",l:"L1"},{n:"Ava Murphy",p:"Dir. of Product",e:"a.murphy@paymo.com",t:"Main User",l:"L2"},{n:"Amir Baker",p:"IT Specialist",e:"a.baker@paymo.com",t:"Tech/Ops",l:"L4"}],null],
+["Webflow",0,20,100,"Enterprise","Sales","prospect","Beyonce Knowles","6025b5380602f80cd4576a1e","",null,5,["silence"],{U:0,E:22,Su:23,Se:20,M:0},[],null],
+["ServiceNow",0,0,50,"Enterprise","Sales","prospect","Axl Rose","6025b3fc0602f80cd45769ad","",null,3,["silence"],{U:0,E:2,Su:3,Se:0,M:0},[],null],
+["Salesforce",0,20,50,"Enterprise","Sales","prospect","Axl Rose","6025b3fc0602f80cd45769ad","",null,3,[],{U:0,E:22,Su:23,Se:20,M:0},[],null],
+["Clay",0,100,50,"Mid-Market","Sales","prospect","Aretha Franklin","5bca458722a689778607f256","",null,3,[],{U:100,E:100,Su:100,Se:100,M:100},[],null],
+["Crossbeam",0,100,50,"Mid-Market","Sales","prospect","Ella Fitzgerald","6025b877fcae5a0c983823c1","",null,3,[],{U:100,E:100,Su:100,Se:100,M:100},[],null],
+["Postman",0,0,100,"Enterprise","Sales","prospect","Axl Rose","6025b3fc0602f80cd45769ad","",null,5,["silence","competitor"],{U:0,E:2,Su:3,Se:0,M:0},[],null]
 ];
 
-const COMPANIES=RAW.map((r,i)=>({id:i+1,n:r[0],arr:r[1],hs:r[2],prev:r[3],tier:r[4],ph:r[5],st:r[6],csm:r[7],csmId:r[8],ren:r[9],rd:r[10],cs:r[11],sig:r[12],hb:r[13],contacts:r[14],col:CL[i%CL.length]}));
+const COMPANIES=RAW.map((r,i)=>({id:i+1,n:r[0],arr:r[1],hs:r[2],prev:r[3],tier:r[4],ph:r[5],st:r[6],csm:r[7],csmId:r[8],ren:r[9],rd:r[10],cs:r[11],sig:r[12],hb:r[13],contacts:r[14],deal:r[15],col:CL[i%CL.length]}));
 
 let state={view:"dashboard",selectedId:null,search:"",segment:"all",owner:"all",companies:COMPANIES.map(c=>({...c})),_agentAcct:1};
 const fmt=v=>v>=1e6?"$"+(v/1e6).toFixed(1)+"M":v>=1e3?"$"+(v/1e3).toFixed(0)+"K":"$"+v;
@@ -171,7 +171,7 @@ const ini=n=>n.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
 async function callClaude(prompt){
   try{const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});
   const d=await r.json();if(d.error)return"Error: "+d.error;return d.text||"No response.";}catch(e){return"Error: "+e.message;}}
-function ctx(c){return`Account: ${c.n}\nHealth: ${c.hs}/100 (prev ${c.prev})\nARR: ${fmt(c.arr)}\nTier: ${c.tier}\nPhase: ${c.ph}\nStatus: ${c.st}\nCSM: ${c.csm} (score ${c.cs}/5)\nRenewal: ${c.ren||"N/A"} (${c.rd?c.rd+" days":"—"})\nSignals: ${c.sig.length?c.sig.join(", "):"None"}\nHealth — Usage:${c.hb.U} Engagement:${c.hb.E} Support:${c.hb.Su} Sentiment:${c.hb.Se} Momentum:${c.hb.M}\nContacts: ${c.contacts.length?c.contacts.map(ct=>ct.n+" ("+ct.p+")").join(", "):"None synced"}`;}
+function ctx(c){return`Account: ${c.n}\nHealth: ${c.hs}/100 (prev ${c.prev})\nARR: ${fmt(c.arr)}\nTier: ${c.tier}\nPhase: ${c.ph}\nStatus: ${c.st}\nCSM: ${c.csm} (score ${c.cs}/5)\nRenewal: ${c.ren||"N/A"} (${c.rd?c.rd+" days":"—"})\nSignals: ${c.sig.length?c.sig.join(", "):"None"}\nHealth — Usage:${c.hb.U} Engagement:${c.hb.E} Support:${c.hb.Su} Sentiment:${c.hb.Se} Momentum:${c.hb.M}\nContacts: ${c.contacts.length?c.contacts.map(ct=>ct.n+" ("+ct.p+(ct.t?', '+ct.t:'')+")").join(", "):"None synced"}\nDeal: ${c.deal?'Stage: '+c.deal.stage+', ARR: '+fmt(c.deal.arr)+', TCV: '+fmt(c.deal.total):'No deal linked'}`;}
 
 // Nav
 const navItems=[{id:"dashboard",label:"Portfolio",icon:"📊"},{id:"model",label:"Health Model",icon:"💡"},{id:"agents",label:"Agents",icon:"⚡"}];
@@ -268,7 +268,8 @@ function renderDetail(el){
       <div class="card"><h3 style="font-size:14px;font-weight:700;margin-bottom:16px">Health Trend</h3><canvas id="trendC" height="220"></canvas></div>
     </div>
     <div class="detail-grid">
-      <div class="card"><h3 style="font-size:14px;font-weight:700;margin-bottom:12px">Contacts</h3>${contactsHtml}</div>
+      <div class="card"><h3 style="font-size:14px;font-weight:700;margin-bottom:12px">Contacts <span style="font-size:11px;font-weight:500;color:var(--s400)">${c.contacts.length} from Planhat</span></h3>${contactsHtml}</div>
+      <div><div class="card" style="margin-bottom:16px"><h3 style="font-size:14px;font-weight:700;margin-bottom:12px">Deal</h3>${c.deal?`<div style="display:flex;gap:16px;flex-wrap:wrap"><div><div style="font-size:11px;color:var(--s500);font-weight:600">Stage</div><span class="badge healthy" style="margin-top:4px"><span class="badge-dot"></span>${c.deal.stage}</span></div><div><div style="font-size:11px;color:var(--s500);font-weight:600">Deal ARR</div><div style="font-size:18px;font-weight:800;margin-top:2px">${fmt(c.deal.arr)}</div></div><div><div style="font-size:11px;color:var(--s500);font-weight:600">TCV</div><div style="font-size:18px;font-weight:800;margin-top:2px">${fmt(c.deal.total)}</div></div><div><div style="font-size:11px;color:var(--s500);font-weight:600">Period</div><div style="font-size:12px;margin-top:4px">${c.deal.start?.slice(0,10)||'—'} → ${c.deal.end?.slice(0,10)||'—'}</div></div></div>`:'<div style="font-size:12px;color:var(--s400);padding:8px 0">No deals linked in Planhat</div>'}</div>
       <div class="card"><h3 style="font-size:14px;font-weight:700;margin-bottom:12px">AI Account Summary</h3>
         <button class="ai-btn" id="aiBtn" onclick="genSum(${c.id})">Generate Summary</button><div id="aiOut"></div>
       </div>
