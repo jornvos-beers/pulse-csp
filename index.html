@@ -163,7 +163,7 @@ const RAW=[
 
 const COMPANIES=RAW.map((r,i)=>({id:i+1,n:r[0],arr:r[1],hs:r[2],prev:r[3],tier:r[4],ph:r[5],st:r[6],csm:r[7],csmId:r[8],ren:r[9],rd:r[10],cs:r[11],sig:r[12],hb:r[13],contacts:r[14],deal:r[15],col:CL[i%CL.length]}));
 
-let state={view:"dashboard",selectedId:null,search:"",segment:"all",owner:"all",companies:COMPANIES.map(c=>({...c})),_agentAcct:1};
+let state={view:"agents",selectedId:null,search:"",segment:"all",owner:"all",companies:COMPANIES.map(c=>({...c})),_agentAcct:1};
 const fmt=v=>v>=1e6?"$"+(v/1e6).toFixed(1)+"M":v>=1e3?"$"+(v/1e3).toFixed(0)+"K":"$"+v;
 const esc=s=>{const d=document.createElement("div");d.textContent=s;return d.innerHTML};
 const st=hs=>hs>=70?"healthy":hs>=40?"monitor":"at-risk";
@@ -174,7 +174,7 @@ async function callClaude(prompt){
 function ctx(c){return`Account: ${c.n}\nHealth: ${c.hs}/100 (prev ${c.prev})\nARR: ${fmt(c.arr)}\nTier: ${c.tier}\nPhase: ${c.ph}\nStatus: ${c.st}\nCSM: ${c.csm} (score ${c.cs}/5)\nRenewal: ${c.ren||"N/A"} (${c.rd?c.rd+" days":"—"})\nSignals: ${c.sig.length?c.sig.join(", "):"None"}\nHealth — Usage:${c.hb.U} Engagement:${c.hb.E} Support:${c.hb.Su} Sentiment:${c.hb.Se} Momentum:${c.hb.M}\nContacts: ${c.contacts.length?c.contacts.map(ct=>ct.n+" ("+ct.p+(ct.t?', '+ct.t:'')+")").join(", "):"None synced"}\nDeal: ${c.deal?'Stage: '+c.deal.stage+', ARR: '+fmt(c.deal.arr)+', TCV: '+fmt(c.deal.total):'No deal linked'}`;}
 
 // Nav
-const navItems=[{id:"dashboard",label:"Portfolio",icon:"📊"},{id:"contacts",label:"Contacts",icon:"👥"},{id:"model",label:"Health Model",icon:"💡"},{id:"agents",label:"Agents",icon:"⚡"}];
+const navItems=[{id:"agents",label:"Today",icon:"⚡"},{id:"dashboard",label:"Portfolio",icon:"📊"},{id:"contacts",label:"Contacts",icon:"👥"},{id:"model",label:"Health Model",icon:"💡"}];
 function renderNav(){document.getElementById("nav").innerHTML=navItems.map(it=>`<button class="${state.view===it.id||(state.view==="detail"&&it.id==="dashboard")?"active":""}" onclick="nav('${it.id}')">${it.icon} <span>${it.label}</span></button>`).join("");}
 function nav(v){state.view=v;if(v!=="detail")state.selectedId=null;render();}
 function selectAcct(id){state.selectedId=id;state.view="detail";render();}
@@ -340,15 +340,81 @@ function renderModel(el){
 }
 
 function renderAgents(el){
-  const opts=state.companies.map(c=>`<option value="${c.id}" ${c.id===state._agentAcct?"selected":""}>${c.n} (${c.hs})</option>`).join("");
-  const actions=[{id:"save",l:"Draft save plan",d:"Rescue strategy for an at-risk account"},{id:"expand",l:"Expansion plays",d:"Identify upsell and cross-sell opportunities"},{id:"qbr",l:"QBR prep",d:"Executive summary and talk track"},{id:"email",l:"Draft outreach",d:"Personalized re-engagement email"}];
+  const pool=state.companies;
+  const atRisk=pool.filter(c=>st(c.hs)==="at-risk").sort((a,b)=>a.hs-b.hs);
+  const monitor=pool.filter(c=>st(c.hs)==="monitor").sort((a,b)=>a.hs-b.hs);
+  const healthy=pool.filter(c=>st(c.hs)==="healthy");
+  const totalArr=pool.reduce((s,c)=>s+c.arr,0);
+  const riskArr=atRisk.reduce((s,c)=>s+c.arr,0);
+  const renewSoon=pool.filter(c=>c.rd&&c.rd<180).sort((a,b)=>(a.rd||999)-(b.rd||999));
+  const hour=new Date().getHours();
+  const greeting=hour<12?"Good morning":hour<17?"Good afternoon":"Good evening";
+
+  const opts=pool.map(c=>`<option value="${c.id}" ${c.id===state._agentAcct?"selected":""}>${c.n} (${c.hs})</option>`).join("");
+  const actions=[{id:"save",l:"Draft save plan",d:"Rescue strategy for an at-risk account"},{id:"expand",l:"Expansion plays",d:"Upsell and cross-sell opportunities"},{id:"qbr",l:"QBR prep",d:"Executive summary and talk track"},{id:"email",l:"Draft outreach",d:"Personalized re-engagement email"}];
+
   el.innerHTML=`
-    <div class="page-header"><div><h1>Agents</h1><p class="sub">AI-powered assistants for customer success.</p></div>
+    <div style="margin-bottom:32px">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:4px">
+        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.5px">${greeting}, Jorn 👋</h1>
+      </div>
+      <p style="font-size:14px;color:var(--s500);line-height:1.6">Here's your daily briefing based on your portfolio of <strong style="color:var(--s700)">${pool.length} accounts</strong> and <strong style="color:var(--s700)">${fmt(totalArr)} ARR</strong>.</p>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#4c1d95,#6d28d9);border-radius:16px;padding:28px 28px 24px;color:#fff;margin-bottom:24px;box-shadow:0 4px 24px rgba(124,58,237,.25)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><span style="font-size:18px">⚡</span><span style="font-size:15px;font-weight:700">Pulse Daily Intelligence</span><span style="font-size:11px;opacity:.6;margin-left:auto">${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</span></div>
+      <div style="font-size:14px;line-height:1.85;opacity:.95">
+        <p>Your portfolio needs immediate attention on <strong>${atRisk.length} at-risk accounts</strong> representing <strong>${fmt(riskArr)} in exposed ARR</strong>. The most critical are <strong>${atRisk.slice(0,3).map(c=>c.n).join(', ')}</strong> — all showing negative sentiment and no recent touchpoints.</p>
+        <p style="margin-top:12px">Four accounts with health scores of zero — <strong>Ahrefs, Iterable, Talkdesk, and Xplenty</strong> — are in silent mode with no engagement for 30+ days. This is ${fmt(atRisk.filter(c=>c.hs===0).reduce((s,c)=>s+c.arr,0))} ARR going dark. The silence-as-signal pattern here is textbook pre-churn.</p>
+        <p style="margin-top:12px"><strong>${renewSoon.length} renewals are approaching within 180 days</strong>, including Iterable, Talkdesk, dbt Labs, and Medallia — all due January 2027. Given current health scores, these are at high risk of non-renewal without intervention this quarter.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
+      <div class="card" style="border-top:3px solid var(--rose)">
+        <div style="font-size:11px;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">🔴 Immediate Actions</div>
+        <div style="font-size:13px;line-height:1.7;color:var(--s700)">
+          <p><strong>1. Rescue Perceptyx & Lakeside</strong> — Both at health 10 with negative sentiment. Schedule executive check-ins with Mick Jagger's accounts this week. Leverage the Decision Maker contacts at ControlUp (Mason Cooper, VP Product) as a model for re-engagement.</p>
+          <p style="margin-top:8px"><strong>2. Break the silence on Ahrefs</strong> — $120K ARR, health 0. Reach out to Oliver Kumar (Engineering Manager) and Mohammed Martin (Director of Product) directly. They haven't engaged in 30+ days.</p>
+          <p style="margin-top:8px"><strong>3. Talkdesk intervention</strong> — $120K ARR stuck in Adoption with health 0. This account dropped from 100 to 0. Needs an escalation path immediately.</p>
+        </div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--amber)">
+        <div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">🟡 This Week's Priorities</div>
+        <div style="font-size:13px;line-height:1.7;color:var(--s700)">
+          <p><strong>1. Renewal prep for Jan '27 cohort</strong> — Iterable ($100K), dbt Labs ($100K), Medallia ($50K), and Talkdesk ($120K) all renew in ~6 months. Build save plans for the at-risk ones, QBR prep for the healthy ones.</p>
+          <p style="margin-top:8px"><strong>2. Exec sponsor engagement</strong> — You have Exec Sponsors at Paymo (Hana King, CEO) and Medallia (Fatima Wilson, CMO). Schedule strategic touchpoints to strengthen these relationships before renewal season.</p>
+          <p style="margin-top:8px"><strong>3. Monitor Envoy & Botkeeper</strong> — Both in Risk phase with negative sentiment. $200K combined ARR. Mick Jagger should run health checks this week.</p>
+        </div>
+      </div>
+      <div class="card" style="border-top:3px solid var(--emerald)">
+        <div style="font-size:11px;font-weight:700;color:var(--emerald);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">🟢 Growth Opportunities</div>
+        <div style="font-size:13px;line-height:1.7;color:var(--s700)">
+          <p><strong>1. ChartMogul expansion</strong> — $195K ARR, health 60, Closed Won deal at $594K TCV. Strong foundation for upsell conversations. Their contract runs through 2029 — long runway to expand.</p>
+          <p style="margin-top:8px"><strong>2. Talkwalker upsell</strong> — $195K ARR with a $395K TCV deal closed. Health at 60 and stable. Explore expansion into additional product lines before the 2028 renewal.</p>
+          <p style="margin-top:8px"><strong>3. Enterprise pipeline</strong> — Clay and Crossbeam are both at health 100 in Sales phase. These are hot prospects that could convert soon. Coordinate with Aretha Franklin and Ella Fitzgerald on next steps.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--s50);border:1px solid var(--s200);border-radius:12px;padding:20px 24px;margin-bottom:32px">
+      <div style="font-size:13px;font-weight:700;color:var(--s700);margin-bottom:8px">📊 Portfolio Snapshot</div>
+      <div style="display:flex;gap:24px;font-size:13px;color:var(--s600);flex-wrap:wrap">
+        <span><strong style="color:var(--rose)">${atRisk.length}</strong> at risk · ${fmt(riskArr)} exposed</span>
+        <span><strong style="color:var(--amber)">${monitor.length}</strong> monitoring</span>
+        <span><strong style="color:var(--emerald)">${healthy.length}</strong> healthy</span>
+        <span><strong>${renewSoon.length}</strong> renewals within 180d</span>
+        <span>Avg health: <strong>${Math.round(pool.reduce((s,c)=>s+c.hs,0)/pool.length)}</strong>/100</span>
+      </div>
+    </div>
+
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:16px">AI Account Agent</h2>
+    <div class="page-header" style="margin-bottom:16px"><div><p class="sub">Select an account and run AI-powered analysis.</p></div>
       <select onchange="state._agentAcct=+this.value">${opts}</select></div>
     <div class="detail-grid">
       <div class="card"><h3 style="font-size:14px;font-weight:700;margin-bottom:12px">Executive Summary</h3>
         <button class="ai-btn" id="execBtn" onclick="runExec()">Generate Executive Brief</button><div id="execOut"></div></div>
-      <div class="card"><h3 style="font-size:14px;font-weight:700;margin-bottom:12px">CS Agent</h3>
+      <div class="card"><h3 style="font-size:14px;font-weight:700;margin-bottom:12px">CS Actions</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">${actions.map(a=>`<button class="seg" style="text-align:left;padding:10px 12px" onclick="runAgent('${a.id}','${esc(a.l)}','${esc(a.d)}')"><strong style="font-size:12px">${a.l}</strong><div style="font-size:10px;color:var(--s400);margin-top:2px">${a.d}</div></button>`).join("")}</div>
         <div id="agentOut"></div></div>
     </div>`;
